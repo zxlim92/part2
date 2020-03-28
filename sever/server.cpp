@@ -5,6 +5,9 @@
 #include <list>
 #include "wdigraph.h"
 #include "dijkstra.h"
+#include "serialport.h"
+#include <sstream>
+using namespace std;
 SerialPort Serial("/dev/ttyACM0");
 struct Point {
     long long lat, lon;
@@ -68,17 +71,36 @@ void readGraph(const string& filename, WDigraph& g, unordered_map<int, Point>& p
     }
   }
 }
+int stage=0 ; // 3 stages - waiting for req(0) , processing req(1), sending req(2)
+void incrementMode(){
+	stage = (stage+1)%3;
+}
 
 // keep in mind that in part 1, the program should only handle 1 request
 // in part 2, you need to listen for a new request the moment you are done
 // handling one request
+
 int main() {
   WDigraph graph;
   unordered_map<int, Point> points;
 
   // build the graph
   readGraph("edmonton-roads-2.0.1.txt", graph, points);
+  while(1){
+  	cout<<"f"<<endl;
+  	if(stage ==0){
+  		string req =Serial.readline(10);
+  		string reqArray[4]; // 0= char 1 = start lattidude 2 = start long 3 = end lat 4 = end lon
+  		stringstream indivdualString(req);
+  		int counter = 0;
+  		while(indivdualString >> reqArray[counter]){
+  			counter ++;
+  		}
+  		cout<<"hello"<<endl;
+  		incrementMode();
 
+  	}
+  }
   // read a request
   char c;
   Point sPoint, ePoint;
