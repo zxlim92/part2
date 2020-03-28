@@ -5,7 +5,7 @@
 #include <list>
 #include "wdigraph.h"
 #include "dijkstra.h"
-
+SerialPort Serial("/dev/ttyACM0");
 struct Point {
     long long lat, lon;
 };
