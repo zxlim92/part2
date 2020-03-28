@@ -73,7 +73,9 @@ void readGraph(const string& filename, WDigraph& g, unordered_map<int, Point>& p
 }
 int stage=0 ; // 3 stages - waiting for req(0) , processing req(1), sending req(2)
 void incrementMode(){
+	cout<<stage<<endl;
 	stage = (stage+1)%3;
+	cout<<stage<<endl;
 }
 
 // keep in mind that in part 1, the program should only handle 1 request
@@ -83,59 +85,67 @@ void incrementMode(){
 int main() {
   WDigraph graph;
   unordered_map<int, Point> points;
-
+ // read a request
+  char c;
+  Point sPoint, ePoint;
   // build the graph
   readGraph("edmonton-roads-2.0.1.txt", graph, points);
   while(1){
-  	cout<<"f"<<endl;
   	if(stage ==0){
-  		string req =Serial.readline(10);
-  		string reqArray[4]; // 0= char 1 = start lattidude 2 = start long 3 = end lat 4 = end lon
-  		stringstream indivdualString(req);
-  		int counter = 0;
-  		while(indivdualString >> reqArray[counter]){
-  			counter ++;
-  		}
-  		cout<<"hello"<<endl;
-  		incrementMode();
-
+  		string req =Serial.readline(1000);
+  		cout<<req<<endl;
   	}
-  }
-  // read a request
-  char c;
-  Point sPoint, ePoint;
-  cin >> c >> sPoint.lat >> sPoint.lon >> ePoint.lat >> ePoint.lon;
+  // 		string reqArray; // 0= char 1 = start lattidude 2 = start long 3 = end lat 4 = end lon
+  // 		stringstream indivdualString(req);
+  // 		int counter = 0;
+  // 		indivdualString>> c >> sPoint.lat >> sPoint.lon >> ePoint.lat >> ePoint.lon;
+  // 		cout<<c<< " "<< sPoint.lat << sPoint.lon << ePoint.lat << ePoint.lon;
 
-  // c is guaranteed to be 'R' in part 1, no need to error check until part 2
+  // 		// while(indivdualString >> reqArray){
+  // 		// 	counter ++;
+  // 		// }
+  // 		cout<<stage<<endl;
+  // 		incrementMode();
 
-  // get the points closest to the two points we read
-  int start = findClosest(sPoint, points), end = findClosest(ePoint, points);
+  // 	}else if (stage ==1){
+  // 		cout<<"yo"<<endl;
+  // 		incrementMode();
+  //   }else if (stage == 2);
+  //   	incrementMode();
+   }
+ 
+ 
 
-  // run dijkstra's, this is the unoptimized version that does not stop
-  // when the end is reached but it is still fast enough
-  unordered_map<int, PIL> tree;
-  dijkstra(graph, start, tree);
+  // // c is guaranteed to be 'R' in part 1, no need to error check until part 2
 
-  // no path
-  if (tree.find(end) == tree.end()) {
-      cout << "N 0" << endl;
-  }
-  else {
-    // read off the path by stepping back through the search tree
-    list<int> path;
-    while (end != start) {
-      path.push_front(end);
-      end = tree[end].first;
-    }
-    path.push_front(start);
+  // // get the points closest to the two points we read
+  // int start = findClosest(sPoint, points), end = findClosest(ePoint, points);
 
-    // output the path
-    cout << "N " << path.size() << endl;
-    for (int v : path) {
-      cout << "W " << points[v].lat << ' ' << points[v].lon << endl;
-    }
-    cout << "E" << endl;
-  }
+  // // run dijkstra's, this is the unoptimized version that does not stop
+  // // when the end is reached but it is still fast enough
+  // unordered_map<int, PIL> tree;
+  // dijkstra(graph, start, tree);
+
+  // // no path
+  // if (tree.find(end) == tree.end()) {
+  //     cout << "N 0" << endl;
+  // }
+  // else {
+  //   // read off the path by stepping back through the search tree
+  //   list<int> path;
+  //   while (end != start) {
+  //     path.push_front(end);
+  //     end = tree[end].first;
+  //   }
+  //   path.push_front(start);
+
+  //   // output the path
+  //   cout << "N " << path.size() << endl;
+  //   for (int v : path) {
+  //     cout << "W " << points[v].lat << ' ' << points[v].lon << endl;
+  //   }
+  //   cout << "E" << endl;
+  // }
 
   return 0;
 }
