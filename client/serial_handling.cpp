@@ -2,10 +2,18 @@
 
 extern shared_vars shared;
 const uint16_t buf_size = 256;
-char* buffer = (char *) malloc(buf_size);
+String buffer = "";
 uint16_t buff_len = 0;
-
+bool wait_timeout(uint8_t nbytes, long timeout) {
+  unsigned long deadline = millis() + timeout;
+  while(Serial.available() < nbytes && (timeout < 0 || millis() < deadline)) {
+    delay(1);
+  }
+  return Serial.available() >= nbytes;
+}
 void request(const lon_lat_32& start, const lon_lat_32& end) {
+  Serial.end();
+  Serial.begin(9600);
   Serial.print("R ");
   Serial.print(start.lat);
   Serial.print(" ");
@@ -17,17 +25,18 @@ void request(const lon_lat_32& start, const lon_lat_32& end) {
   Serial.println();
 }
 uint8_t process() {
+  buffer = "";
+  buff_len = 0;
   while(1) {
-    if(Serial.available()) {
+    if(wait_timeout(1,1000)) {
       char in_char = Serial.read();
       if(in_char == '\n' || in_char == '\r') {
         return 1;
       }
       else {
         if(buff_len < buf_size - 1) {
-          buffer[buff_len] = in_char;
+          buffer += in_char;
           buff_len++;
-          buffer[buff_len] = 0;
         }
       }
     }
@@ -49,31 +58,24 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
   // 1 indicates a successful exchange, of course you should only output 1
   // in your final solution if the exchange was indeed successful
   // (otherwise, return 0 if the communication failed)
-  Serial.setTimeout(10000);
-  if(!Serial.available()) {
-    request(start, end);
-    return 0;
-  }
-  else {
+  request(start, end);
+  if(wait_timeout(1,10000)) {
     char input = Serial.read();
     if(input == 'N') {
       uint8_t n = process();
       if(n == 0) {
-        return 0;;
+        return 0;
       }
       else {
-        for(int i = 1; i < buff_len; i++) {
-          int temp = buffer[i] - '0';
-          temp = temp * 10 * (buff_len - i - 1);
-          shared.num_waypoints += temp;
-        }
+        String temp = buffer.substring(1,buff_len);
+        shared.num_waypoints = temp.toInt();
         Serial.println("A");
       }
 
 
     }
     for(int i = 0; i < shared.num_waypoints; i++) {
-      if(Serial.available()) {
+      if(wait_timeout(1,10000)) {
         input = Serial.read();
         if(input == 'W') {
           lon_lat_32 point;
@@ -83,22 +85,15 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
           }
           else {
             int i = 1;
-            while(buffer[i] != ' ') {
+            while(buffer.substring(i, i+1) != " ") {
               i++;
             }
-            for(int j = i - 1; j >= 1; j--) {
-              int temp = buffer[i - j] - '0';
-              temp = temp * 10 * j;
-              point.lat += temp;
-              i++;
-            }
-            i++;
-            for(int j = i; j < buff_len; j++) {
-              int temp = buffer[j] - '0';
-              temp = temp * 10 * (buff_len - j - 1);
-              shared.num_waypoints += temp;
-            }
-            Serial.println("A");
+            String temp = buffer.substring(1, i);
+            point.lat = (int32_t)temp.toInt();
+            temp = buffer.substring(i + 1, buff_len);
+            point.lon = (int32_t)temp.toInt();
+            shared.waypoints[i] = point;
+            Serial.println("A"); 
           }
 
         }
@@ -107,10 +102,9 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
         return 0;
       }
     }
-    if(Serial.available()) {
+    if(wait_timeout(1,10000)) {
       input = Serial.read();
       if(input == 'E') {
-        Serial.println("A");
         return 1;
       }
     }
@@ -118,6 +112,9 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
       return 0;
     }
     
+  }
+  else {
+    return 0;
     
   }
 
