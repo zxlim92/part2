@@ -6,8 +6,7 @@
 #include "wdigraph.h"
 #include "dijkstra.h"
 #include "serialport.h"
-#include <sstream>
-using namespace std;
+
 SerialPort Serial("/dev/ttyACM0");
 struct Point {
     long long lat, lon;
@@ -71,105 +70,101 @@ void readGraph(const string& filename, WDigraph& g, unordered_map<int, Point>& p
     }
   }
 }
-int stage=0 ; // 3 stages - waiting for req(0) , processing req(1), sending req(2)
-void incrementMode(){
-
-	stage = (stage+1)%3;
-
-}
 
 // keep in mind that in part 1, the program should only handle 1 request
 // in part 2, you need to listen for a new request the moment you are done
 // handling one request
-
 int main() {
   WDigraph graph;
   unordered_map<int, Point> points;
- // read a request
-  char c;
-  Point sPoint, ePoint;
+
   // build the graph
-  unordered_map<int, PIL> tree;
-   list<int> path;
   readGraph("edmonton-roads-2.0.1.txt", graph, points);
-  while(1){
-  	if(stage ==0){
-  		string req =Serial.readline(10);
-  		// cout<<req<<endl;
-  	
-  		string reqArray; // 0= char 1 = start lattidude 2 = start long 3 = end lat 4 = end lon
-  		stringstream indivdualString(req);
-  		int counter = 0;
-  		indivdualString>> c >> sPoint.lat >> sPoint.lon >> ePoint.lat >> ePoint.lon;
-  		cout<<c<< " "<< sPoint.lat << sPoint.lon << ePoint.lat << ePoint.lon <<endl;
 
-  		// while(indivdualString >> reqArray){
-  		// 	counter ++;
-  		// }
-  		incrementMode();
+  // read a request
+  while(1) {
+    Point sPoint, ePoint;
+    string input = Serial.readline();
+    if(input[0] == 'R') {
+      cout << input << endl;
+      int i = 2;
+      while(input.substr(i,1) != " ") {
+        i++;
+      }
+      string temp = input.substr(2, i - 2);
+      sPoint.lat = stoll(temp);
+      int j = i+1;
+      while(input.substr(j,1) != " ") {
+        j++;
+      }
+      temp = input.substr(i+1,j - i - 1);
+      sPoint.lon = stoll(temp);
+      int k = j + 1;
+      while(input.substr(k,1) != " ") {
+        k++;
+      }
+      temp = input.substr(j+1,k - j - 1);
+      ePoint.lat = stoll(temp);
+      temp = input.substr(k+1,temp.size() - k -1);
+      ePoint.lon = stoll(temp);
+      cout << sPoint.lat << " " << sPoint.lon << " " << ePoint.lat << " " << ePoint.lon << endl;
+      int start = findClosest(sPoint, points), end = findClosest(ePoint, points);
 
-  	}else if (stage ==1){
-  		 // get the points closest to the two points we read
-  		int start = findClosest(sPoint, points), end = findClosest(ePoint, points);
-  		// run dijkstra's, this is the unoptimized version that does not stop
-  		// when the end is reached but it is still fast enough
-  		
-  		dijkstra(graph, start, tree);
-  		// no path
-  		if (tree.find(end) == tree.end()) {
-     		 Serial.writeline("N 0 /n");
-     		 tree.clear();
-  		} else {
-    // read off the path by stepping back through the search tree
-	   
-	    while (end != start) {
-	      path.push_front(end);
-	      end = tree[end].first;
-	    }
-	    path.push_front(start);
+      // run dijkstra's, this is the unoptimized version that does not stop
+      // when the end is reached but it is still fast enough
+      unordered_map<int, PIL> tree;
+      dijkstra(graph, start, tree);
 
-	    // output the path
-	    cout << "N " << path.size() << endl;
-	    Serial.writeline("N ");
-	    Serial.writeline(to_string(path.size()));
-	    Serial.writeline("\n");
-	    
-	    string readline = Serial.readline(1000);
-	    if(readline == "A\n"){
-	    	incrementMode();
-	    	
-	    }else{
-	    	stage =0;
-	    	tree.clear();
-	    	path.clear();
-	    }
-	  }
+      // no path
+      if (tree.find(end) == tree.end()) {
+          Serial.writeline("N 0\n");
+          cout << "N 0" << endl;
+      }
+      else {
+        // read off the path by stepping back through the search tree
+        list<int> path;
+        while (end != start) {
+          path.push_front(end);
+          end = tree[end].first;
+        }
+        path.push_front(start);
+
+        // output the path
+        
+        string size = to_string(path.size());
+        temp = "";
+        temp.append("N ");
+        temp.append(size);
+        temp.append("\n");
+        Serial.writeline(temp);
+        cout << "N " << path.size() << endl;
+        for (int v : path) {
+          input = Serial.readline();
+          if(input[0] == 'A') {
+            temp = "";
+            temp.append("W ");
+            string lat = to_string(points[v].lat);
+            string lon = to_string(points[v].lon);
+            temp.append(lat);
+            temp.append(" ");
+            temp.append(lon);
+            temp.append("\n");
+            Serial.writeline(temp);
+            cout << "W " << points[v].lat << " " << points[v].lon << endl;
+          }
+          
+        }
+        input = Serial.readline();
+        if(input[0] == 'A') {
+          Serial.writeline("E\n");
+          cout << "E" << endl;
+        }
+      }
+    }
+  }
 
 
-    }else if (stage == 2);
-    	for (int v : path) {
-	      cout << "W " << points[v].lat << ' ' << points[v].lon << endl;
-	      Serial.writeline("W");
-	      Serial.writeline( to_string(points[v].lat));
-	      Serial.writeline(" ");
-	      Serial.writeline(to_string(points[v].lon));
-	      Serial.writeline("\n");
-	    }
-	    cout << "E" << endl;
-	    Serial.writeline("E\n");
-    	tree.clear();
-	    	path.clear();
-    	incrementMode();
-   }
- 
- 
 
-  // c is guaranteed to be 'R' in part 1, no need to error check until part 2
 
- 
-  
-
-  
- 
   return 0;
 }

@@ -4,6 +4,8 @@ extern shared_vars shared;
 const uint16_t buf_size = 256;
 String buffer = "";
 uint16_t buff_len = 0;
+
+
 bool wait_timeout(uint8_t nbytes, long timeout) {
   unsigned long deadline = millis() + timeout;
   while(Serial.available() < nbytes && (timeout < 0 || millis() < deadline)) {
@@ -84,13 +86,13 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
             return 0;
           }
           else {
-            int i = 1;
-            while(buffer.substring(i, i+1) != " ") {
-              i++;
+            int j = 1;
+            while(buffer.substring(j, j+1) != " ") {
+              j++;
             }
-            String temp = buffer.substring(1, i);
+            String temp = buffer.substring(1, j);
             point.lat = (int32_t)temp.toInt();
-            temp = buffer.substring(i + 1, buff_len);
+            temp = buffer.substring(j + 1, buff_len);
             point.lon = (int32_t)temp.toInt();
             shared.waypoints[i] = point;
             Serial.println("A"); 
