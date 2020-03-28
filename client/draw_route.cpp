@@ -26,6 +26,6 @@ void draw_route() {
 
       // draw the line from one point to the other
       shared.tft->drawLine(p1_loc.x, p1_loc.y, p2_loc.x,
-                            p2_loc.y, ILI9341_BLUE);
+                            p2_loc.y, TFT_RED);
   }
 }

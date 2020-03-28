@@ -2,8 +2,8 @@
 
 extern shared_vars shared;
 const uint16_t buf_size = 256;
-char* buffer = (char *) malloc(bufsize);
-uint16_t buf_len = 0;
+char* buffer = (char *) malloc(buf_size);
+uint16_t buff_len = 0;
 
 void request(const lon_lat_32& start, const lon_lat_32& end) {
   Serial.print("R ");
@@ -16,7 +16,7 @@ void request(const lon_lat_32& start, const lon_lat_32& end) {
   Serial.print(end.lon);
   Serial.println();
 }
-uint8_t process(char input) {
+uint8_t process() {
   while(1) {
     if(Serial.available()) {
       char in_char = Serial.read();
@@ -24,9 +24,9 @@ uint8_t process(char input) {
         return 1;
       }
       else {
-        if(buf_len < buf_size - 1) {
-          buffer[buf_len] = in_char;
-          buf_len++;
+        if(buff_len < buf_size - 1) {
+          buffer[buff_len] = in_char;
+          buff_len++;
           buffer[buff_len] = 0;
         }
       }
@@ -62,9 +62,9 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
         return 0;;
       }
       else {
-        for(int i = 1; i < buf_len; i++) {
+        for(int i = 1; i < buff_len; i++) {
           int temp = buffer[i] - '0';
-          temp = temp * 10 * (buf_len - i - 1);
+          temp = temp * 10 * (buff_len - i - 1);
           shared.num_waypoints += temp;
         }
         Serial.println("A");
@@ -93,9 +93,9 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
               i++;
             }
             i++;
-            for(int j = i; j < buf_len; j++) {
+            for(int j = i; j < buff_len; j++) {
               int temp = buffer[j] - '0';
-              temp = temp * 10 * (buf_len - j - 1);
+              temp = temp * 10 * (buff_len - j - 1);
               shared.num_waypoints += temp;
             }
             Serial.println("A");
