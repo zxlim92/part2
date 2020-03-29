@@ -64,6 +64,7 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
   if(wait_timeout(1,10000)) {
     char input = Serial.read();
     if(input == 'N') {
+      status_message("Receiving...");
       uint8_t n = process();
       if(n == 0) {
         return 0;
@@ -107,18 +108,16 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
     if(wait_timeout(1,10000)) {
       input = Serial.read();
       if(input == 'E') {
-        return 1;
       }
     }
     else {
       return 0;
     }
-    
   }
   else {
     return 0;
     
   }
-
+  return 1;
   
 }

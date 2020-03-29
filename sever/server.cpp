@@ -86,7 +86,6 @@ int main() {
     Point sPoint, ePoint;
     string input = Serial.readline();
     if(input[0] == 'R') {
-      cout << input << endl;
       int i = 2;
       while(input.substr(i,1) != " ") {
         i++;
@@ -107,7 +106,6 @@ int main() {
       ePoint.lat = stoll(temp);
       temp = input.substr(k+1,temp.size() - k -1);
       ePoint.lon = stoll(temp);
-      cout << sPoint.lat << " " << sPoint.lon << " " << ePoint.lat << " " << ePoint.lon << endl;
       int start = findClosest(sPoint, points), end = findClosest(ePoint, points);
 
       // run dijkstra's, this is the unoptimized version that does not stop
