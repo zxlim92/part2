@@ -1,1 +1,47 @@
-hi
+Name: Le Minh Dang,Zi Xue Lim
+CCID : mldang, zixue
+ID #: 1581106,1573849
+
+Reference: Dijsktra Pseudocode from Lecture, Part 1 solution on eclass was used
+
+Assignment 2 Part 2: Server and client
+
+Client directory:
+Included files:
+    * client.cpp
+    * consts_and_types.h
+    * Makefile
+    * draw_route.cpp
+    * draw_route.h
+    * instructions.txt
+    * lcd_image.cpp
+    * lcd_image.h
+    * map_drawing.cpp
+    * map_drawing.h
+    * serial_handling.cpp
+    * serial_handling.h
+
+
+Included files:
+    * dijkstra.cpp
+    * dijkstra.h
+    * Makefile
+    * README
+    * server.cpp
+    * edmonton-roads-2.0.1.txt
+    * digraph.cpp
+    * digraph.h
+    * serialport.cpp
+    * serialport.h
+    * wdigraph.h
+Running Instructions:
+	Run "make" to compile all of the targets.
+    Run "make server" to compile the everything and link to server.
+    Run "make dijkstra.o" to compile the dijkstra.cpp.
+    Run "make digraph.o" to compile the digraph.cpp.
+    Run "make server.o" to compile the server.cpp.
+    Run "make clean" to delete all the compiled file.
+
+Assumption:
+	The software assumes that the edmonton-roads-2.0.txt is in the same directory with the ./server.
+    The input file must follow the convention from the Assignment manual, otherwise it will not input the commands
