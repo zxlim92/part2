@@ -2,10 +2,13 @@
 
 extern shared_vars shared;
 const uint16_t buf_size = 256;
+
+// setting up serial buffer
 String buffer = "";
 uint16_t buff_len = 0;
 
 
+// this function is modelled exactly the same with wait_on_serial3() from cmput274
 bool wait_timeout(uint8_t nbytes, long timeout) {
   unsigned long deadline = millis() + timeout;
   while(Serial.available() < nbytes && (timeout < 0 || millis() < deadline)) {
@@ -13,9 +16,13 @@ bool wait_timeout(uint8_t nbytes, long timeout) {
   }
   return Serial.available() >= nbytes;
 }
+
+// sending request to Host for routing
 void request(const lon_lat_32& start, const lon_lat_32& end) {
+  // end the serial to clear out the buffer
   Serial.end();
   Serial.begin(9600);
+  // start the request
   Serial.print("R ");
   Serial.print(start.lat);
   Serial.print(" ");
@@ -26,6 +33,11 @@ void request(const lon_lat_32& start, const lon_lat_32& end) {
   Serial.print(end.lon);
   Serial.println();
 }
+
+
+// processing input by reading all the bytes and add them to the string, modelled similar
+// to example from eclass, 
+// return 0 if fails to process, 1 if succeed
 uint8_t process() {
   buffer = "";
   buff_len = 0;
@@ -70,13 +82,16 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
         return 0;
       }
       else {
+        // extract the number of waypoints in buffer
         String temp = buffer.substring(1,buff_len);
         shared.num_waypoints = temp.toInt();
         Serial.println("A");
       }
-
-
     }
+    else {
+      return 0;
+    }
+    // processing the location of waypoints
     for(int i = 0; i < shared.num_waypoints; i++) {
       if(wait_timeout(1,10000)) {
         input = Serial.read();
@@ -84,6 +99,7 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
           lon_lat_32 point;
           uint8_t n = process();
           if(n == 0) {
+            // things went south
             return 0;
           }
           else {
@@ -91,6 +107,7 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
             while(buffer.substring(j, j+1) != " ") {
               j++;
             }
+            // extract lat and lon from the buffer
             String temp = buffer.substring(1, j);
             point.lat = (int32_t)temp.toInt();
             temp = buffer.substring(j + 1, buff_len);
@@ -98,23 +115,28 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
             shared.waypoints[i] = point;
             Serial.println("A"); 
           }
-
+        }
+        else {
+          return 0;
         }
       }
       else {
+        // things went south
         return 0;
       }
     }
     if(wait_timeout(1,10000)) {
       input = Serial.read();
-      if(input == 'E') {
-      }
+      // if it does not get E from Host
+      if(input != 'E') return 0;
     }
     else {
+      // things went south
       return 0;
     }
   }
   else {
+    // things went south
     return 0;
     
   }

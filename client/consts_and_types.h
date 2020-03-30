@@ -76,7 +76,7 @@ namespace clientpins {
 
   // analog pins for joystick axes
   const uint8_t joy_x_pin = A8;
-  const uint8_t joy_y_pin = A10;
+  const uint8_t joy_y_pin = A9;
 
   // joystick button pin
   const uint8_t joy_button_pin = 53;
