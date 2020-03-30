@@ -84,8 +84,8 @@ int main() {
   // read a request
   while(1) {
     Point sPoint, ePoint;
-    string input = Serial.readline();
-    if(input[0] == 'R') {
+    string input = Serial.readline(); // read input in serial 
+    if(input[0] == 'R') { // get start and end coordinates needed after R
       int i = 2;
       while(input.substr(i,1) != " ") {
         i++;
@@ -106,7 +106,7 @@ int main() {
       ePoint.lat = stoll(temp);
       temp = input.substr(k+1,temp.size() - k -1);
       ePoint.lon = stoll(temp);
-      int start = findClosest(sPoint, points), end = findClosest(ePoint, points);
+      int start = findClosest(sPoint, points), end = findClosest(ePoint, points); // get closest way points to the start longitude and lattitude
 
       // run dijkstra's, this is the unoptimized version that does not stop
       // when the end is reached but it is still fast enough
@@ -129,9 +129,9 @@ int main() {
 
         // output the path
         
-        string size = to_string(path.size());
+        string size = to_string(path.size()); // convert to string 
         temp = "";
-        temp.append("N ");
+        temp.append("N "); 
         temp.append(size);
         temp.append("\n");
         Serial.writeline(temp);
@@ -139,7 +139,7 @@ int main() {
         for (int v : path) {
           input = Serial.readline();
           if(input[0] == 'A') {
-            temp = "";
+            temp = ""; // string variable to build up the string output before writing it on the serial 
             temp.append("W ");
             string lat = to_string(points[v].lat);
             string lon = to_string(points[v].lon);
@@ -153,7 +153,7 @@ int main() {
           
         }
         input = Serial.readline();
-        if(input[0] == 'A') {
+        if(input[0] == 'A') { // end of waypoints
           Serial.writeline("E\n");
           cout << "E" << endl;
         }
