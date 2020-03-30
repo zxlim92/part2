@@ -87,8 +87,9 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
         shared.num_waypoints = temp.toInt();
         Serial.println("A");
       }
-
-
+    }
+    else {
+      return 0;
     }
     // processing the location of waypoints
     for(int i = 0; i < shared.num_waypoints; i++) {
@@ -114,7 +115,9 @@ uint8_t get_waypoints(const lon_lat_32& start, const lon_lat_32& end) {
             shared.waypoints[i] = point;
             Serial.println("A"); 
           }
-
+        }
+        else {
+          return 0;
         }
       }
       else {

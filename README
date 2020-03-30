@@ -2,7 +2,7 @@ Name: Le Minh Dang,Zi Xue Lim
 CCID : mldang, zixue
 ID #: 1581106,1573849
 
-Reference: Dijsktra Pseudocode from Lecture, Part 1 solution on eclass was used
+Reference: Dijsktra Pseudocode from Lecture, Part 1 solution on eclass was used, Part 2 Assignment 2 CMPUT274 
 
 Assignment 2 Part 2: Server and client
 
@@ -34,6 +34,14 @@ Included files:
     * serialport.cpp
     * serialport.h
     * wdigraph.h
+
+Wiring Instruction: 
+    A8 -> VRX
+    A9 -> VRY
+    53 -> SW
+    45 -> Zoom In button
+    47 -> Zoom Out button
+
 Running Instructions:
 	Run "make" to compile all of the targets.
     Run "make server" to compile the everything and link to server.
