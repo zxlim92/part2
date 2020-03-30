@@ -2,10 +2,10 @@ Name: Le Minh Dang,Zi Xue Lim
 CCID : mldang, zixue
 ID #: 1581106,1573849
 
-Reference: Dijsktra Pseudocode from Lecture, Part 1 solution on eclass was used, Part 2 Assignment 2 CMPUT274 
+Reference: Dijsktra Pseudocode from Lecture, Part 1 solution on eclass was used, Part 2 Assignment 2 CMPUT275
 
 Assignment 2 Part 2: Server and client
-
+Modification: Only modifications are serial_handling.cpp and draw_route.cpp
 Client directory:
 Included files:
     * client.cpp
@@ -21,6 +21,13 @@ Included files:
     * serial_handling.cpp
     * serial_handling.h
 
+Wiring Instruction: 
+    A8 -> VRX
+    A9 -> VRY
+    53 -> SW
+    45 -> Zoom In button
+    47 -> Zoom Out button
+
 Server directory:
 Included files:
     * dijkstra.cpp
@@ -35,12 +42,6 @@ Included files:
     * serialport.h
     * wdigraph.h
 
-Wiring Instruction: 
-    A8 -> VRX
-    A9 -> VRY
-    53 -> SW
-    45 -> Zoom In button
-    47 -> Zoom Out button
 
 Running Instructions:
 	Run "make" to compile all of the targets.
