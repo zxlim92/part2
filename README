@@ -21,7 +21,7 @@ Included files:
     * serial_handling.cpp
     * serial_handling.h
 
-
+Server directory:
 Included files:
     * dijkstra.cpp
     * dijkstra.h
